@@ -1,0 +1,133 @@
+/*
+12/4/2025 written by Norma Winters
+This script creates or replaces three items: type,  package spec, package body
+The purpose is to demonstrate knowledge of Oracle
+
+Random Inspection Days Package
+Purpose:
+Generates random future inspection dates within a 3-30 day window from the current date. Supports single date generation or multiple dates returned as comma-separated values. Useful for scheduling randomized compliance inspections, quality audits, or any process requiring unpredictable future dates within a defined range.
+
+Technical Summary:
+Oracle 19c, Oracle 21c, Oracle 23c, Oracle 23ai
+Language: PL/SQL
+Compatibility: Oracle 8i and later
+Core Technology: Uses DBMS_RANDOM.VALUE for random number generation
+Date Range: 3 to 30 days from SYSDATE
+Custom Type: date_table_type (nested table of DATE)
+Output Formats: 
+Single DATE value or a CSV string with configurable date format (default: YYYY-MM-DD)
+
+
+Key Features:
+
+Single random date generation
+Multiple dates with possible duplicates
+Multiple unique dates with duplicate prevention
+Customizable date format output
+Built-in validation (max 28 unique dates in range)
+*/
+
+
+
+-- Create custom date collection type
+CREATE OR REPLACE TYPE date_table_type AS TABLE OF DATE;
+/
+
+CREATE OR REPLACE PACKAGE random_inspection_pkg AS
+  /*
+   * Package to generate random inspection dates in the future
+   * Range: 3 to 30 days from current date
+   */
+  
+  -- Get a single random inspection date
+  FUNCTION get_random_inspection_date RETURN DATE;
+  
+  -- Get multiple random inspection dates as CSV (can have duplicates)
+  FUNCTION get_multiple_dates(p_count IN NUMBER, p_format IN VARCHAR2 DEFAULT 'YYYY-MM-DD') RETURN VARCHAR2;
+  
+  -- Get multiple unique random inspection dates as CSV
+  FUNCTION get_unique_dates(p_count IN NUMBER, p_format IN VARCHAR2 DEFAULT 'YYYY-MM-DD') RETURN VARCHAR2;
+  
+END random_inspection_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY random_inspection_pkg AS
+
+  -- Get a single random inspection date between 3 and 30 days from today
+  FUNCTION get_random_inspection_date RETURN DATE IS
+    v_random_days NUMBER;
+    v_inspection_date DATE;
+  BEGIN
+    -- Generate random number between 3 and 30
+    v_random_days := DBMS_RANDOM.VALUE(3, 30);
+    
+    -- Add random days to current date
+    v_inspection_date := TRUNC(SYSDATE) + v_random_days;
+    
+    RETURN v_inspection_date;
+  END get_random_inspection_date;
+  
+  -- Get multiple random inspection dates as CSV (may contain duplicates)
+  FUNCTION get_multiple_dates(p_count IN NUMBER, p_format IN VARCHAR2 DEFAULT 'YYYY-MM-DD') RETURN VARCHAR2 IS
+    v_csv VARCHAR2(4000) := '';
+    v_date DATE;
+  BEGIN
+    FOR i IN 1..p_count LOOP
+      v_date := get_random_inspection_date();
+      
+      IF i = 1 THEN
+        v_csv := TO_CHAR(v_date, p_format);
+      ELSE
+        v_csv := v_csv || ',' || TO_CHAR(v_date, p_format);
+      END IF;
+    END LOOP;
+    
+    RETURN v_csv;
+  END get_multiple_dates;
+  
+  -- Get multiple unique random inspection dates as CSV
+  FUNCTION get_unique_dates(p_count IN NUMBER, p_format IN VARCHAR2 DEFAULT 'YYYY-MM-DD') RETURN VARCHAR2 IS
+    v_dates date_table_type := date_table_type();
+    v_date DATE;
+    v_exists NUMBER;
+    v_csv VARCHAR2(4000) := '';
+  BEGIN
+    -- Check if requested count is reasonable
+    IF p_count > 28 THEN
+      RAISE_APPLICATION_ERROR(-20001, 
+        'Cannot guarantee ' || p_count || ' unique dates in a 28-day range');
+    END IF;
+    
+    WHILE v_dates.COUNT < p_count LOOP
+      v_date := get_random_inspection_date();
+      
+      -- Check if date already exists in collection
+      v_exists := 0;
+      FOR i IN 1..v_dates.COUNT LOOP
+        IF v_dates(i) = v_date THEN
+          v_exists := 1;
+          EXIT;
+        END IF;
+      END LOOP;
+      
+      -- Add if unique
+      IF v_exists = 0 THEN
+        v_dates.EXTEND;
+        v_dates(v_dates.COUNT) := v_date;
+      END IF;
+    END LOOP;
+    
+    -- Build CSV string
+    FOR i IN 1..v_dates.COUNT LOOP
+      IF i = 1 THEN
+        v_csv := TO_CHAR(v_dates(i), p_format);
+      ELSE
+        v_csv := v_csv || ',' || TO_CHAR(v_dates(i), p_format);
+      END IF;
+    END LOOP;
+    
+    RETURN v_csv;
+  END get_unique_dates;
+
+END random_inspection_pkg;
+/
