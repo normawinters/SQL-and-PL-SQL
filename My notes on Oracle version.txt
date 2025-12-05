@@ -1,0 +1,75 @@
+My notes on Oracle version 
+Written by Norma Jean Winters
+on December 5, 2025
+
+Oracle Database Version Timeline After 21c
+
+Oracle 21c (Innovation Release - 2020)
+    released as an innovation release
+    Premier Support extended until July 31, 2027
+    Not eligible for Extended Support
+    Only quarterly Release Updates (RUs) provided
+
+Oracle 23c / 23ai 
+      Released 2023 with codename "App Simple" Oracle
+      This long-term release builds upon Oracle Database 21c's foundation, 
+      300 new features 
+      Rebranded as "23ai" in May 2024 to emphasize AI capabilities
+         Key features include: 
+             AI vector search
+             native VECTOR datatype
+             JSON enhancements
+             graph capabilities 
+             microservices support
+Currently available on 
+          Oracle Cloud Infrastructure (OCI)
+          Exadata 
+          Oracle Database Appliance
+
+
+Important Notes
+          Oracle Database 23ai only allows direct upgrades from versions 19c and 21c 
+
+          The current strategy shows Oracle focusing on their cloud-first approach, with new            releases initially appearing on Oracle Cloud before becoming available for broader on-premises deployment.
+
+-------------------------------------------
+
+The website Oracle live sql https://livesql.oracle.com
+As of December 2025 has two options from the main page.
+      Classic Oracle 19c
+      Oracle 23 ai
+
+-------------------------------------------
+
+Key Features Worth Highlighting
+
+1. AI Vector Search (The Flagship Feature)
+AI Vector Search allows the database to store and query vector representations of data, which is essential for capturing the semantic meaning of text, images, and other unstructured content Oracle. This includes a new VECTOR data type with dedicated indexes and SQL operators, making Oracle competitive in AI/ML workloads without needing separate vector databases.
+
+2. JSON Relational Duality
+JSON Relational Duality allows developers to leverage both relational data and the simplicity of JSON within a single app Oracle-Base. This bridges the gap between SQL and NoSQL approaches, letting you work with the same data as either relational tables or JSON documents.
+
+3. IF [NOT] EXISTS DDL Clause
+The IF [NOT] EXISTS DDL clause makes the SQL command easier to create or drop objects that exist or do not exist without receiving an error Oracle-Base. This is a huge quality-of-life improvement that developers have wanted for years.
+
+4. SELECT Without FROM Clause
+You can now run queries like SELECT SYSDATE; or SELECT 1+2; without needing FROM DUAL, improving SQL code portability.
+
+5. Schema-Level Privileges
+System privileges can now be granted at the schema level, simplifying the privilege management process Stack Overflow.
+
+6. New Developer Role
+A new developer role makes it easy to quickly assign developers privileges required for application development Oracle-Base.
+
+7. JavaScript Stored Procedures
+Run JavaScript code natively inside the database without moving data out for processing.
+
+8. SQL Firewall
+New security feature that lets you control exactly what SQL is executed against your database, protecting against SQL injection attacks.
+
+9. Desupported(depreciated not supported any long) Features to Watch Out For
+Some features will be deprecated in Oracle 23ai including: the original Export Utility (EXP), Oracle Enterprise Manager Database Express (EM Express), 10G database password verifier, 32-bit Oracle Database clients, and Database Upgrade Assistant (DBUA) Oracle-Base.
+
+10. Over 300 New Features
+Oracle Database 23ai offers over 300 new features Oracle-Base, not all features are highlighted above.
+
