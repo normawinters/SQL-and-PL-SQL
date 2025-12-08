@@ -4,15 +4,24 @@
 --Written 12/7/2025 Norma Winters
 
 
-/*The CTE (dept_avg) computes the average salary per department.
-The main query then: Joins employees with dept_avg to compare each employee’s   salary to their department average.
+/*
+CTE  Common Table Expression, uses the keyword WITH
 
-Also joins departments to display department names.
-Only displays/returns employees whose salary is above the department average.
+CTE is another way of writing inline tables or subqueries. 
+The "with" clause is used for the following reasons.
+
+The easiest way to see how the CTE is used is to look for its name in the query.  
+
+Readability and organization - CTEs let you break complex queries into logical, named steps . You can test and optimize  these steps separately from the rest of the query.
+
+You can reference the CTE multiple times.
+
+Maintainability -  Easier to make changes to with clause and testing change.
+
+Performance - In some databases, CTEs can be optimized better than subqueries, though this varies by system. Some databases 
 
 Note: see how the dept-avg is used, will help understand this sql.
 */
-
 
 WITH dept_avg AS (
     SELECT 
@@ -40,4 +49,22 @@ WHERE
     e.salary > da.avg_salary
 ORDER BY 
     e.department_id, e.salary DESC;
+
+-------------------------------
+Try just the with clause as below for testing the cte
+----------------------------------
+WITH dept_avg AS (
+    SELECT 
+        department_id,
+        AVG(salary) AS avg_salary
+    FROM 
+        employees
+    GROUP BY 
+        department_id
+)
+SELECT  *
+FROM 
+     dept_avg da;
+
+
 
